@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Scope {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  roleAccess  RoleResourceAccess[]
+
+  @@map("scopes")
+}
+
+model Resource {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  roleAccess  RoleResourceAccess[]
+
+  @@map("resources")
+}
+
+model Role {
+  id          String               @id @default(uuid())
+  name        String               @unique
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  roleAccess  RoleResourceAccess[]
+
+  @@map("roles")
+}
+
+model RoleResourceAccess {
+  id         String   @id @default(uuid())
+  roleId     String
+  resourceId String
+  scopeId    String
+  createdAt  DateTime @default(now())
+
+  role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  scope    Scope    @relation(fields: [scopeId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, resourceId, scopeId])
+  @@map("roles_resources_access")
+}
