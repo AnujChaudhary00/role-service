@@ -1,7 +1,7 @@
 # Stage 1 — build TypeScript + generate Prisma client
 # node:22-slim (Debian/glibc) matches Lambda's glibc so the rhel binary works
 FROM node:22-slim AS builder
-RUN npm install -g pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
@@ -10,7 +10,7 @@ RUN pnpm exec prisma generate && pnpm build
 
 # Stage 2 — production dependencies only
 FROM node:22-slim AS prod-deps
-RUN npm install -g pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
